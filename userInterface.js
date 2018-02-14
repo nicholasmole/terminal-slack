@@ -1,13 +1,15 @@
 const blessed = require('blessed');
+//const globaluser = require('./globaluser.js');
 
 const keyBindings = {};
 
 module.exports = {
+
   init() {
     const screen = blessed.screen({
       autopadding: true,
       smartCSR: true,
-      title: 'Slack',
+      title: 'Slack-a-tron',
       fullUnicode: true,
     });
 
@@ -16,7 +18,7 @@ module.exports = {
       height: '100%',
       style: {
         fg: '#bbb',
-        bg: '#1d1f21',
+        bg: '#000',
       },
     });
 
@@ -27,7 +29,7 @@ module.exports = {
 
     const mainWindow = blessed.box({
       width: '70%',
-      height: '100%',
+      height: '99%',
       left: '30%',
       // scrollable: true,
       border: {
@@ -49,26 +51,117 @@ module.exports = {
       width: '90%',
       height: '75%',
       left: '5%',
-      top: '10%',
+      top: '5%',
       keys: true,
       vi: true,
       scrollable: true,
+      border: {
+        type: 'line',
+      },
+      style: {
+        border: {
+          fg: '#888',
+        },
+      },
       alwaysScroll: true,
       tags: true,
     });
 
-    const messageInput = blessed.textbox({
+    var messageInput ;
+
+    /********** slackCAt ****/
+    
+    function slackCat() {
+      const slackBoxTitle = blessed.text({
+        width: '90%',
+        left: '5%',
+        align: 'left',
+        content: '{bold}slackCat{/bold}',
+        tags: true,
+      });
+      const slackBox = blessed.textbox({
+        width: '90%',
+        height: 'shrink',
+        left: '5%',
+        top: '5%',
+        keys: true,
+        vi: true,
+        inputOnFocus: true,
+        border: {
+          fg: '#cc6666',
+          type: 'line',
+        },
+      });
+      function removeSlackBox() {
+        mainWindow.remove(slackBox);
+        mainWindow.remove(slackBoxTitle);
+        mainWindow.append(mainWindowTitle);
+        mainWindow.append(chatWindow);
+        mainWindow.append(messageInput);
+        messageInput.focus();
+        screen.render();
+        //messageInput.focus.bind(messageInput);
+      }
+      slackBox.on('submit', (text) => {
+        // event when slackcat is submitted
+        // or more concisely
+        const sys = require('util');
+        const exec = require('child_process').exec;
+        //function puts(error, stdout, stderr='') { sys.puts(stdout); }
+
+        exec(`slackcat -c ${global.globaluser} ${text} 2>/dev/null` , (err, stdout, stderr) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          //~/not_Desk/XZITO/cated.php
+          //console.log(stdout);
+        });
+        removeSlackBox();
+      });
+      slackBox.on('keypress', (ch, key) => {
+        if (Object.keys(keyBindings).includes(key.full)) {
+          slackBox.cancel();
+          removeSlackBox();
+          const fn = keyBindings[key.full];
+          if (fn) {
+            fn();
+          }
+        }
+      });
+      slackBox.on('keypress', (ch, key) => {
+        if (key.name === 'down') {
+          removeSlackBox();
+          const fn = keyBindings[key.full];
+          if (fn) {
+            fn();
+          }
+        }
+      });
+      mainWindow.remove(mainWindowTitle);
+      mainWindow.remove(chatWindow);
+      mainWindow.remove(messageInput);
+      mainWindow.append(slackBoxTitle);
+      mainWindow.append(slackBox);
+      slackBox.focus();
+      screen.render();
+    }
+
+    messageInput = blessed.textbox({
       width: '90%',
       left: '5%',
-      top: '85%',
+      top: '80%',
       keys: true,
       vi: true,
+      cat: slackCat,
       inputOnFocus: true,
       border: {
         type: 'line',
       },
     });
+    //const slackC = slackCat();
 
+    /****************SEARCH */
     function searchChannels(searchCallback) {
       const searchBoxTitle = blessed.text({
         width: '90%',
@@ -150,6 +243,7 @@ module.exports = {
       keys: true,
       vi: true,
       search: searchChannels,
+      cat: slackCat,
       style: {
         selected: {
           bg: '#373b41',
@@ -189,6 +283,7 @@ module.exports = {
       keys: true,
       vi: true,
       search: searchChannels,
+      cat: slackCat,
       style: {
         selected: {
           bg: '#373b41',
@@ -227,7 +322,13 @@ module.exports = {
     userList.on('keypress', callKeyBindings);
     channelList.on('keypress', callKeyBindings);
     chatWindow.on('keypress', callKeyBindings);
+
     messageInput.on('keypress', (ch, key) => {
+      if (key.name === 'up') {
+        slackCat();
+        messageInput.cancel();
+        callKeyBindings(ch, key);
+      }
       if (Object.keys(keyBindings).includes(key.full)) {
         messageInput.cancel();
         callKeyBindings(ch, key);

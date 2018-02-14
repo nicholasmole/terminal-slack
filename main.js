@@ -1,8 +1,9 @@
 const notifier = require('node-notifier');
 const path = require('path');
-
+//const globaluser = require('./globaluser.js');
 const ui = require('./userInterface.js');
 const slack = require('./slackClient.js');
+
 
 const components = ui.init(); // ui components
 let users;
@@ -117,7 +118,7 @@ function handleNewMessage(message) {
 
 slack.init((data, ws) => {
   currentUser = data.self;
-
+  //global.globaluser = currentUser.name;
   // don't update focus until ws is connected
   // focus on the channel list
   components.channelList.select(0);
@@ -222,6 +223,7 @@ function updateMessages(data, markFn) {
       // get the author
       if (message.user === currentUser.id) {
         username = currentUser.name;
+       // global.globaluser = currentUser.name;
       } else {
         for (i = 0; i < len; i += 1) {
           if (message.user === users[i].id) {
@@ -258,7 +260,7 @@ components.userList.on('select', (data) => {
   components.mainWindowTitle.setContent(`{bold}${username}{/bold}`);
   components.chatWindow.setContent('Getting messages...');
   components.screen.render();
-
+  global.globaluser = username;
   // get user's id
   const userId = users.find(potentialUser => potentialUser.name === username).id;
 
@@ -280,7 +282,7 @@ components.channelList.on('select', (data) => {
   components.mainWindowTitle.setContent(`{bold}${channelName}{/bold}`);
   components.chatWindow.setContent('Getting messages...');
   components.screen.render();
-
+  global.globaluser = channelName;
   // join the selected channel
   slack.joinChannel(channelName, (error, response, channelData) => {
     const parsedChannelData = JSON.parse(channelData);
