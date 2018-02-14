@@ -173,9 +173,10 @@ slack.init((data, ws) => {
       );
       return;
     }
-
+    
     const parsedUserData = JSON.parse(userData);
-    users = parsedUserData.members.filter(user => !user.deleted && user.id !== currentUser.id);
+    //users = parsedUserData.members.filter(user => !user.deleted && user.id !== currentUser.id);
+    users = parsedUserData.members.filter(user => !user.deleted);
 
     components.userList.setItems(users.map(slackUser => slackUser.name));
     components.screen.render();

@@ -324,13 +324,16 @@ module.exports = {
     chatWindow.on('keypress', callKeyBindings);
 
     messageInput.on('keypress', (ch, key) => {
-      if (key.name === 'up') {
+
+      if (key.name === 'down') {
         slackCat();
         messageInput.cancel();
-        callKeyBindings(ch, key);
+        //callKeyBindings(ch, key);
       }
+      
       if (Object.keys(keyBindings).includes(key.full)) {
         messageInput.cancel();
+        
         callKeyBindings(ch, key);
       }
     });
