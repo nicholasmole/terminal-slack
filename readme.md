@@ -1,4 +1,5 @@
 # Terminal Slack
+
 A terminal interface for Slack.
 
 ![Screenshot of Termianl Slack](screen-shot.png)
@@ -14,6 +15,9 @@ A terminal interface for Slack.
 | Select users list | `ctrl` + `u` |
 | Select writing area | `ctrl` + `w` |
 | Select message list | `ctrl` + `l` |
+| SlackCat | `down` |
+
+###### slack cat opens only when in writing area
  
 ## Prerequsites
  - [Node](https://nodejs.org/en/) v6.0.0 or higher
@@ -65,3 +69,51 @@ A terminal interface for Slack.
  	```
  	export SLACK_TOKEN='xoxp-254112160503-252950188691-252375361712-6cbf56aada30951a9d310a5f23d032a0'
  	```
+
+## Download Slack CAT!
+
+	```
+	brew install slackcat 
+	```
+
+	Go to the site below
+	Click `Add to slack`
+	(Login if you need to)
+	Go to the bottom of the page
+	Click `Authorize`
+
+	The api token is you user API token so this can be used in your .bashrc
+
+
+[Slack CAT website](http://slackcat.chat/)
+
+## Nick Mole Configs
+
+WARNING! You have no volume control as of yet.
+
+Most stuff is out of the box from these 2 application.
+
+Download the terminal slack **from here** and not the other repo. 
+However, you need to install **slack cat** seperately. 
+
+
+download :
+```
+git clone git@github.com:nicholasmole/terminal-slack.git
+```
+
+Add these two things to your .bashrc
+```
+export SLACK_TOKEN='<%YOUR_TOKEN_HERE%';
+alias tslack="cd ~<%DIRECTORY_TO_SLACK_TERMINAL%>/terminal-slack && node main.js;"
+```
+either get the token from [Slack Legacy Tokens](https://api.slack.com/custom-integrations/legacy-tokens)
+or from slack cat.
+
+Run your chosen alias to run the slack terminal & you should be all set! 
+Use the Controls above for help
+```
+tslack
+````
+
+

@@ -314,7 +314,7 @@ components.userList.on('select', (data) => {
 });
 
 components.channelList.on('select', (data) => {
-  exec(`afplay ./selecton.wav  2>/dev/null` , (err, stdout, stderr) => {
+  exec(`afplay ./selecton.wav -v 0.5  2>/dev/null` , (err, stdout, stderr) => {
     if (err) {
       console.error(err);
       return;}
