@@ -1,8 +1,10 @@
 const blessed = require('blessed');
 //const globaluser = require('./globaluser.js');
+const sys = require('util');
+const exec = require('child_process').exec;
 
 const keyBindings = {};
-
+var cow;
 module.exports = {
 
   init() {
@@ -100,13 +102,11 @@ module.exports = {
         mainWindow.append(messageInput);
         messageInput.focus();
         screen.render();
-        //messageInput.focus.bind(messageInput);
       }
       slackBox.on('submit', (text) => {
         // event when slackcat is submitted
         // or more concisely
-        const sys = require('util');
-        const exec = require('child_process').exec;
+        
         //function puts(error, stdout, stderr='') { sys.puts(stdout); }
 
         exec(`slackcat -c ${global.globaluser} ${text} 2>/dev/null` , (err, stdout, stderr) => {
@@ -117,6 +117,7 @@ module.exports = {
           //~/not_Desk/XZITO/cated.php
           //console.log(stdout);
         });
+
         removeSlackBox();
       });
       slackBox.on('keypress', (ch, key) => {
@@ -307,11 +308,14 @@ module.exports = {
     screen.append(container);
 
     keyBindings.escape = process.exit.bind(null, 0); // esc to exit
-    keyBindings['C-c'] = channelList.focus.bind(channelList); // ctrl-c for channels
+    keyBindings['C-c'] = cow = channelList.focus.bind(channelList); // ctrl-c for channels
     keyBindings['C-u'] = userList.focus.bind(userList); // ctrl-u for users
     keyBindings['C-w'] = messageInput.focus.bind(messageInput); // ctrl-w for write
+    
     keyBindings['C-l'] = chatWindow.focus.bind(chatWindow); // ctrl-l for message list
-
+    //keyBindings['M-'] = chatWindow.focus.bind(chatWindow); // ctrl-l for message list
+    //keyBindings['-m'] = messageInput.focus.bind(messageInput); // ctrl-w for write
+    
     function callKeyBindings(ch, key) {
       const fn = keyBindings[key.full];
       if (fn) {
@@ -319,6 +323,10 @@ module.exports = {
       }
     }
 
+    const onBlur = (component) => {
+      component.style.border = { fg: '#888' }; // eslint-disable-line no-param-reassign
+      screen.render();
+    };
     userList.on('keypress', callKeyBindings);
     channelList.on('keypress', callKeyBindings);
     chatWindow.on('keypress', callKeyBindings);
@@ -327,8 +335,10 @@ module.exports = {
 
       if (key.name === 'down') {
         slackCat();
+        // chatWindow.focus.bind(mainWindow);
+        // chatWindow.focus();
         messageInput.cancel();
-        //callKeyBindings(ch, key);
+        callKeyBindings(ch, key);
       }
       
       if (Object.keys(keyBindings).includes(key.full)) {
@@ -338,14 +348,56 @@ module.exports = {
       }
     });
 
+    //channel list
+    channelList.on('keypress', (ch, key) => {
+      if (key.name === 'up') {
+        exec(`afplay ./moveup.wav  2>/dev/null` , (err, stdout, stderr) => {
+          if (err) {
+            console.error(err);
+            return;}
+        });
+      } else if (key.name === 'down') {
+        exec(`afplay ./movedown.wav  2>/dev/null` , (err, stdout, stderr) => {
+          if (err) {
+            console.error(err);
+            return;}
+        });
+      }
+    });
+    //user list
+    userList.on('keypress', (ch, key) => {
+      if (key.name === 'up') {
+        exec(`afplay ./moveup.wav  2>/dev/null` , (err, stdout, stderr) => {
+          if (err) {
+            console.error(err);
+            return;}
+        });
+      } else if (key.name === 'down') {
+        exec(`afplay ./movedown.wav  2>/dev/null` , (err, stdout, stderr) => {
+          if (err) {
+            console.error(err);
+            return;}
+        });
+      }
+    });
     // scrolling in chat window
     chatWindow.on('keypress', (ch, key) => {
       if (key.name === 'up') {
         chatWindow.scroll(-1);
         screen.render();
+        exec(`afplay ./moveup.wav  2>/dev/null` , (err, stdout, stderr) => {
+          if (err) {
+            console.error(err);
+            return;}
+        });
       } else if (key.name === 'down') {
         chatWindow.scroll(1);
         screen.render();
+        exec(`afplay ./movedown.wav  2>/dev/null` , (err, stdout, stderr) => {
+          if (err) {
+            console.error(err);
+            return;}
+        });
       }
     });
 
@@ -353,11 +405,15 @@ module.exports = {
     const onFocus = (component) => {
       component.style.border = { fg: '#cc6666' }; // eslint-disable-line no-param-reassign
       screen.render();
+      exec(`afplay ./climb.wav  2>/dev/null` , (err, stdout, stderr) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+  
+      });
     };
-    const onBlur = (component) => {
-      component.style.border = { fg: '#888' }; // eslint-disable-line no-param-reassign
-      screen.render();
-    };
+  
     userList.on('focus', onFocus.bind(null, usersBox));
     userList.on('blur', onBlur.bind(null, usersBox));
     channelList.on('focus', onFocus.bind(null, channelsBox));

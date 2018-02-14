@@ -4,6 +4,8 @@ const path = require('path');
 const ui = require('./userInterface.js');
 const slack = require('./slackClient.js');
 
+const sys = require('util');
+const exec = require('child_process').exec;
 
 const components = ui.init(); // ui components
 let users;
@@ -26,6 +28,13 @@ const getNextId = (() => {
   };
 })();
 
+exec(`afplay ./intro-beeps-2.wav  2>/dev/null` , (err, stdout, stderr) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+});
 // handles the reply to say that a message was successfully sent
 function handleSentConfirmation(message) {
   // for some reason getLines gives an object with int keys
@@ -93,6 +102,18 @@ function handleNewMessage(message) {
   if (message.user === currentUser.id) {
     username = currentUser.name;
   } else {
+    //Add a noise
+    
+    //function puts(error, stdout, stderr='') { sys.puts(stdout); }
+
+    exec(`afplay ./goodcoin.wav  2>/dev/null` , (err, stdout, stderr) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+
+    });
+
     const author = users.find(user => message.user === user.id);
     username = (author && author.name) || UNKNOWN_USER_NAME;
 
@@ -138,6 +159,17 @@ slack.init((data, ws) => {
 
   // initialize these event handlers here as they allow functionality
   // that relies on websockets
+
+  //TEST BUTTONS
+  components.messageInput.on('keypress', (ch, key) => {
+    if (key.name === 'up') {
+
+      components.chatWindow.focus();
+      //upcomponents.chatWindow.focus();
+      components.screen.render();
+      //components.screen.render();
+    }
+  });
 
   // event handler when message is submitted
   components.messageInput.on('submit', (text) => {
@@ -255,6 +287,11 @@ function updateMessages(data, markFn) {
 }
 
 components.userList.on('select', (data) => {
+  exec(`afplay ./selecton.wav  2>/dev/null` , (err, stdout, stderr) => {
+    if (err) {
+      console.error(err);
+      return;}
+  });
   const username = data.content;
 
   // a channel was selected
@@ -277,6 +314,11 @@ components.userList.on('select', (data) => {
 });
 
 components.channelList.on('select', (data) => {
+  exec(`afplay ./selecton.wav  2>/dev/null` , (err, stdout, stderr) => {
+    if (err) {
+      console.error(err);
+      return;}
+  });
   const channelName = data.content;
 
   // a channel was selected
